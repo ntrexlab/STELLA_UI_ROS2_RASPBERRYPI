@@ -1,0 +1,9 @@
+connection_data:
+  remote_ip: ''
+  robot_id: ''
+  robot_ip: ''
+  robot_password: ''
+navigation:
+  path_nav: ''
+save_map:
+  path_save_map: ''
