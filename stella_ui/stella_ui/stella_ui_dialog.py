@@ -365,7 +365,7 @@ class MyFrame(rtmgr.MyFrame):
 		if v == True:
 			self.robot_connect_proc = psutil.Popen(['sshpass', '-p', robot_password, 'ssh', robot_id + '@' + robot_ip, '-oStrictHostKeyChecking=no', 'source ~/ros_colcon_ws/install/setup.bash && source ~/colcon_ws/install/local_setup.bash && ros2 launch stella_bringup robot.launch.py'], stdout=out, stderr=err)
 		elif v == False:
-			self.robot_connect_proc = psutil.Popen(['sshpass', '-p', robot_password, 'ssh', robot_id + '@' + robot_ip, '-oStrictHostKeyChecking=no', 'source /opt/ros/melodic/setup.bash && source ~/catkin_ws/devel/setup.bash && export ROS_MASTER_URI=http://' + remote_ip +':11311 && export ROS_HOSTNAME=' + robot_ip + ' && rosnode kill stella_md_node stella_ahrs_node ydlidar_node'], stdout=out, stderr=err)
+			self.robot_connect_proc = psutil.Popen(['sshpass', '-p', robot_password, 'ssh', robot_id + '@' + robot_ip, '-oStrictHostKeyChecking=no', 'source ~/ros_colcon_ws/install/setup.bash && source ~/colcon_ws/install/local_setup.bash && killall -9 stella_md_node stella_ahrs_node ydlidar_node joint_state_pub robot_state_pub'], stdout=out, stderr=err)
 
 	def OnSlam(self, event):
 		v = (event.GetEventObject()).GetValue()
@@ -374,11 +374,11 @@ class MyFrame(rtmgr.MyFrame):
 
 		if v == True:
 			self.button_save_map.Enable()
-			self.robot_slam_proc = psutil.Popen("gnome-terminal --tab -- ros2 launch stella_cartographer cartographer.launch.py && sleep 2 && wmctrl -r 'stella_cartographer.rviz - RViz' -e 0,0,180,630,770",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
+			self.robot_slam_proc = psutil.Popen("gnome-terminal --tab -- ros2 launch stella_cartographer cartographer.launch.py && sleep 2 && wmctrl -r 'stella_cartographer.rviz - RViz' -e 0,70,150,630,780",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
 
 		elif v == False:
 			self.button_save_map.Disable()
-			self.robot_slam_proc = psutil.Popen("killall -9 rviz2",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
+			self.robot_slam_proc = psutil.Popen("killall -9 rviz2 cartographer_node occupancy_grid_node",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
 
 
 	def OnSaveMap(self, event):
@@ -404,9 +404,9 @@ class MyFrame(rtmgr.MyFrame):
 		self.path_navigation = self.load_dic.get('navigation').get('path_nav')
 
 		if v == True:
-			self.robot_nav_proc = psutil.Popen("gnome-terminal --tab -- ros2 launch stella_navigation2 navigation2.launch.py map:=" + self.path_navigation + "&& sleep 2 && wmctrl -r 'stella_navigation.rviz - RViz' -e 0,0,180,630,770",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
+			self.robot_nav_proc = psutil.Popen("gnome-terminal --tab -- ros2 launch stella_navigation2 navigation2.launch.py map:=" + self.path_navigation + "&& sleep 2 && wmctrl -r 'nav2_default_view.rviz - RViz' -e 0,70,150,630,780",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
 		elif v == False:
-			self.robot_nav_proc = psutil.Popen("killall -9 rviz2",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
+			self.robot_nav_proc = psutil.Popen("killall -9 map_server amcl controller_server planner_server recoveries_server bt_navigator waypoint_follower rviz2 lifecycle_manager",stdin=subprocess.PIPE, stdout=out, stderr=err, shell=True)
 
 	def teleoperation(self):
 		while self.button_teleoperation.GetValue() == True:
